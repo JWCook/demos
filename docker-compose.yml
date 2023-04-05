@@ -9,6 +9,7 @@ services:
     volumes:
       - ~/workspace:/home/jovyan/work
       - ~/.cache:/home/jovyan/.cache
+      - ~/.aws:/home/jovyan/.aws
     restart: unless-stopped
     environment:
       JUPYTER_ENABLE_LAB: 'yes'
