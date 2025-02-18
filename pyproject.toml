@@ -7,6 +7,7 @@ dependencies = [
     'attrs',
     'ipdb',
     'ipython',
+    'datasette',
     'pandas',
     'pillow',
     'platformdirs',
