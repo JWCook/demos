@@ -5,8 +5,6 @@ authors = [{ name = 'Jordan Cook' }]
 requires-python = '>=3.10'
 dependencies = [
     'attrs',
-    'ipdb',
-    'ipython',
     'datasette',
     'pandas',
     'pillow',
@@ -15,17 +13,20 @@ dependencies = [
     'python-dateutil',
     'pytimeparse',
     'pyyaml',
-    'requests',
-    'requests-cache',
+    'requests-cache>=1.2',
+    'requests>=2.30',
     'rich',
     'tablib',
+    'textual>=2.0',
+    'time-machine',
     'ujson',
     'whenever',
-    'time_machine',
 ]
 
 [dependency-groups]
 dev = [
+    'ipdb',
+    'ipython',
     'nox',
     'pre-commit',
     'pytest',
