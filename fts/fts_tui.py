@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# Example FTS search TUI with live update
 import asyncio
 import sqlite3
 from typing import Optional
@@ -8,6 +9,8 @@ from textual.containers import Container
 from textual.reactive import reactive
 from textual.widgets import Input, Markdown
 
+DB_PATH = 'demo.db'
+FTS_TABLE = 'pkg_fts'
 MAX_RESULTS = 50
 
 
@@ -17,10 +20,11 @@ class SearchResults(Markdown):
     def __init__(self):
         super().__init__('')
         self.markup = True
+        self.count = 0
 
     def watch_results(self, results: list[str]):
         if results:
-            self.update('\n * '.join([f'{len(results)} results'] + results[:MAX_RESULTS]))
+            self.update('\n * '.join([f'{self.count} results'] + results))
         else:
             self.update('No results')
 
@@ -28,8 +32,10 @@ class SearchResults(Markdown):
 class SearchApp(App):
     def __init__(self):
         super().__init__()
+
         self._search_task: Optional[asyncio.Task] = None
-        self.conn = sqlite3.connect('demo.db')
+        self.conn = sqlite3.connect(DB_PATH)
+        self.cursor = self.conn.cursor()
 
     def compose(self):
         yield Container(
@@ -39,6 +45,8 @@ class SearchApp(App):
 
     def on_input_changed(self, event: Input.Changed):
         """Handle input changes; delay running query until typing stops for 200ms"""
+        # Non-delayed version:
+        # self.autocomplete(event.value)
 
         async def _delayed_search(query: str):
             await asyncio.sleep(0.2)
@@ -52,14 +60,22 @@ class SearchApp(App):
             self.query_one(SearchResults).results = []
 
     def autocomplete(self, query: str):
+        results_widget = self.query_one(SearchResults)
         try:
             query += '*'
-            results = self.conn.execute(
-                'SELECT name, desc FROM pkg_fts WHERE name MATCH ?', (query,)
+
+            # Run count query separately to avoid fetching all results
+            count_result = self.cursor.execute(
+                f'SELECT COUNT(*) FROM {FTS_TABLE} WHERE name MATCH ?', (query,)
             ).fetchall()
-            self.query_one(SearchResults).results = [f'**{row[0]}** - {row[1]}' for row in results]
+            results_widget.count = count_result[0][0]
+
+            results = self.cursor.execute(
+                f'SELECT * FROM {FTS_TABLE} WHERE name MATCH ? LIMIT ?', (query, MAX_RESULTS)
+            ).fetchall()
+            results_widget.results = [f'**{row[0]}** - {row[1]}' for row in results]
         except Exception as e:
-            self.query_one(SearchResults).update(f'Error: {e}')
+            results_widget.update(f'Error: {e}')
 
 
 if __name__ == '__main__':
