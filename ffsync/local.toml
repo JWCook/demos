@@ -1,0 +1,19 @@
+master_secret = "pass"
+
+human_logs = 1
+
+host = "0.0.0.0"
+port = 8000
+
+syncstorage.database_url = "mysql://ffsync:pass@mariadb:3306/syncstorage_rs"
+syncstorage.enable_quota = 0
+syncstorage.enabled = true
+
+tokenserver.database_url = "mysql://ffsync:pass@mariadb:3306/tokenserver_rs"
+tokenserver.enabled = true
+tokenserver.fxa_email_domain = "api.accounts.firefox.com"
+tokenserver.fxa_metrics_hash_secret = "pass"
+tokenserver.fxa_oauth_server_url = "https://oauth.accounts.firefox.com"
+tokenserver.fxa_browserid_audience = "https://token.services.mozilla.com"
+tokenserver.fxa_browserid_issuer = "https://api.accounts.firefox.com"
+tokenserver.fxa_browserid_server_url = "https://verifier.accounts.firefox.com/v2"

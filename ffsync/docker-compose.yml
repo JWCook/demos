@@ -1,0 +1,35 @@
+services:
+  ffsync:
+    build: .
+    container_name: ffsync
+    ports:
+      - 8446:8000
+    volumes:
+      - ./local.toml:/config/local.toml
+    depends_on:
+      - mariadb
+    environment:
+      LOGLEVEL: info
+      SYNC_URL: http://localhost:8446
+      # SYNC_URL: https://ffsync.example.com
+      SYNC_CAPACITY: 5 # Max number of users
+      SYNC_MASTER_SECRET: ${FF_SYNC_MASTER_SECRET}
+      METRICS_HASH_SECRET: ${FF_METRICS_HASH_SECRET}
+      SYNC_SYNCSTORAGE_DATABASE_URL: mysql://${FF_MYSQL_USER}:${FF_MYSQL_PASS}@mariadb:3306/syncstorage_rs
+      SYNC_TOKENSERVER_DATABASE_URL: mysql://${FF_MYSQL_USER}:${FF_MYSQL_PASS}@mariadb:3306/tokenserver_rs
+    restart: unless-stopped
+
+  mariadb:
+    image: linuxserver/mariadb:10.11.8
+    container_name: mariadb
+    ports:
+      - 3306:3306
+    volumes:
+      - /app/mariadb:/config
+      - ./init.sql:/config/initdb.d/init.sql
+    environment:
+      MYSQL_DATABASE: syncstorage
+      MYSQL_USER: ${FF_MYSQL_USER}
+      MYSQL_PASSWORD: ${FF_MYSQL_PASS}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASS}
+    restart: unless-stopped
