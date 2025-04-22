@@ -1,5 +1,3 @@
-version: '3.7'
-
 services:
   jupyter:
     container_name: jupyter
@@ -37,7 +35,7 @@ services:
     image: mongo
     container_name: mongo
     environment:
-      MONGO_INITDB_DATABASE: 'requests_cache_pytest'
+      MONGO_INITDB_DATABASE: 'requests_cache'
     ports:
       - 27017:27017
     volumes:
